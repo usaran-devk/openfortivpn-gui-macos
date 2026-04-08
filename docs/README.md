@@ -154,4 +154,4 @@ Disconnect is handled in three stages:
 
 ## License
 
-Copyright DEVK. All rights reserved.
+This project is licensed under the [GNU General Public License v3.0](../LICENSE).

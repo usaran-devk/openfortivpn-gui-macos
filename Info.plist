@@ -23,6 +23,6 @@
     <key>LSUIElement</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright DEVK. All rights reserved.</string>
+    <string>Copyright DEVK. Licensed under GPLv3.</string>
 </dict>
 </plist>

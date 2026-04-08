@@ -6,3 +6,7 @@ authentication support.
 
 See [docs/README.md](docs/README.md) for full documentation (build, install,
 usage, and project structure).
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
