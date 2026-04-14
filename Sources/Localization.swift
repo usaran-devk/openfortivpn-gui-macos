@@ -186,5 +186,11 @@ enum L10n {
         static var hostRequired: String {
             locale == "de" ? "VPN-Host ist erforderlich." : "VPN host is required."
         }
+        static var generalSection: String {
+            locale == "de" ? "Allgemein" : "General"
+        }
+        static var launchAtLogin: String {
+            locale == "de" ? "Bei Anmeldung starten" : "Launch at Login"
+        }
     }
 }

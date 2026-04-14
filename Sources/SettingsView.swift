@@ -1,3 +1,4 @@
+import ServiceManagement
 import SwiftUI
 
 /// Settings window for configuring VPN connection parameters.
@@ -8,6 +9,7 @@ struct SettingsView: View {
     @State private var samlPort: String = ""
     @State private var setDNS: Bool = false
     @State private var peerDNS: Bool = true
+    @State private var launchAtLogin: Bool = false
     @State private var hostError: String = ""
     @State private var portError: String = ""
 
@@ -48,6 +50,13 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                Toggle(L10n.Settings.launchAtLogin, isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { setLaunchAtLogin(launchAtLogin) }
+            } header: {
+                Text(L10n.Settings.generalSection)
+            }
+
             HStack {
                 Spacer()
                 Button(L10n.Settings.restoreDefaults) {
@@ -70,6 +79,7 @@ struct SettingsView: View {
         samlPort = "\(vpnManager.settings.samlPort)"
         setDNS = vpnManager.settings.setDNS
         peerDNS = vpnManager.settings.peerDNS
+        launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 
     private func saveSettings() {
@@ -90,6 +100,21 @@ struct SettingsView: View {
         peerDNS = d.peerDNS
         hostError = ""
         portError = ""
+    }
+
+    /// Register or unregister the app as a login item via `SMAppService`.
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            NSLog("SettingsView: failed to \(enabled ? "register" : "unregister") login item: %@", error.localizedDescription)
+            // Revert toggle to reflect actual state
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+        }
     }
 
     private func validateHost() {

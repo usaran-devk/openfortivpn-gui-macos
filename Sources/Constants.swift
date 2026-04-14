@@ -91,7 +91,7 @@ enum Constants {
         static let popoverWidth: CGFloat = 320
         static let popoverHeight: CGFloat = 380
         static let settingsWidth: CGFloat = 420
-        static let settingsHeight: CGFloat = 300
+        static let settingsHeight: CGFloat = 360
         /// Maximum number of log lines retained in the buffer.
         static let logBufferLimit = 500
         static let logDateFormat = "HH:mm:ss"

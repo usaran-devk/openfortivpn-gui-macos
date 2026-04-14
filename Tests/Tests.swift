@@ -490,6 +490,8 @@ func testLocalization() {
             try expectFalse(L10n.Settings.peerDNS.isEmpty)
             try expectFalse(L10n.Settings.save.isEmpty)
             try expectFalse(L10n.Settings.restoreDefaults.isEmpty)
+            try expectFalse(L10n.Settings.launchAtLogin.isEmpty)
+            try expectFalse(L10n.Settings.generalSection.isEmpty)
         }
 
         it("locale detection returns en or de") {

@@ -93,6 +93,7 @@ Click the gear icon in the popover footer to open the settings window:
 |-------------------|------------------------|--------------------------------------|
 | VPN Host          | *(empty)*              | FortiGate VPN gateway hostname       |
 | SAML Port         | `8020`                 | Local port for the SAML login proxy (1–65535) |
+| Launch at Login   | Off                    | Start the app automatically on user login |
 | Set DNS           | Off                    | `--set-dns` flag for openfortivpn    |
 | Use Peer DNS      | On                     | `--pppd-use-peerdns` flag            |
 
