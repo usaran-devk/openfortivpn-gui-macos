@@ -8,6 +8,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     let vpnManager = VPNManager()
 
+    // Menu bar SF Symbols are sized via symbol configuration, not image.size.
+    private let statusIconConfiguration = NSImage.SymbolConfiguration(
+        pointSize: 15,
+        weight: .regular,
+        scale: .medium
+    )
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Menu bar only – hide from Dock
         NSApp.setActivationPolicy(.accessory)
@@ -22,13 +29,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupMenuBar() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem = NSStatusBar.system.statusItem(withLength: 22)
 
         if let button = statusItem.button {
-            button.image = NSImage(
-                systemSymbolName: Constants.Symbols.shieldDefault,
-                accessibilityDescription: L10n.MenuBar.label
-            )
+            button.imageScaling = .scaleProportionallyUpOrDown
+            button.image = makeStatusIcon(named: Constants.Symbols.shieldDefault)
             button.action = #selector(togglePopover)
             button.target = self
         }
@@ -58,10 +63,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .disconnecting:  symbolName = Constants.Symbols.shieldDefault
         case .error:          symbolName = Constants.Symbols.shieldError
         }
-        statusItem.button?.image = NSImage(
+
+        statusItem.button?.image = makeStatusIcon(named: symbolName)
+    }
+
+    private func makeStatusIcon(named symbolName: String) -> NSImage? {
+        let baseImage = NSImage(
             systemSymbolName: symbolName,
             accessibilityDescription: L10n.MenuBar.label
         )
+        let configuredImage = baseImage?.withSymbolConfiguration(statusIconConfiguration) ?? baseImage
+        configuredImage?.isTemplate = true
+        return configuredImage
     }
 
     /// Closes the popover so the Settings window can appear unobstructed.
