@@ -51,7 +51,11 @@ uninstall-sudoers:
 
 # Full install: build, set up sudoers, copy to /Applications.
 install: $(APP_BUNDLE) install-sudoers
-	@cp -R $(APP_BUNDLE) /Applications/
+	@TMP_APP="/Applications/$(APP_NAME).app.tmp"; \
+	rm -rf "$$TMP_APP"; \
+	cp -R $(APP_BUNDLE) "$$TMP_APP"; \
+	rm -rf /Applications/$(APP_NAME).app; \
+	mv "$$TMP_APP" /Applications/$(APP_NAME).app
 	@echo "Installed to /Applications/$(APP_NAME).app"
 
 # Full uninstall: remove app and sudoers rule.
