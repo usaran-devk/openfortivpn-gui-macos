@@ -59,6 +59,125 @@ make uninstall
 
 Removes the app from `/Applications` and the sudoers rule.
 
+## Automated Deployment (Intune, Jamf, etc.)
+
+For enterprise deployments via Mobile Device Management (MDM) solutions like
+Intune, you can pre-configure the VPN settings without requiring manual setup
+on first app start.
+
+### Option 1: Post-Install Script with `defaults write`
+
+Create a shell script that runs after installation:
+
+```bash
+#!/bin/bash
+# configure-vpn.sh - Intune deployment script
+
+VPN_HOST="${1:-your.vpn.host.com}"
+SAML_PORT="${2:-8020}"
+
+# Write settings to macOS preferences
+defaults write com.github.usaran-devk.openfortivpn-gui vpnSettings \
+  "$(printf '{"vpnHost":"%s","samlPort":%d,"setDNS":false,"peerDNS":true}' "$VPN_HOST" "$SAML_PORT")"
+
+echo "OpenFortiVPN configured with host: $VPN_HOST port: $SAML_PORT"
+```
+
+**Deploy via Intune:**
+1. Add the script to your deployment package
+2. Run: `./configure-vpn.sh "vpn.company.com" 8020`
+
+### Option 2: macOS Configuration Profile (mobileconfig)
+
+Create a Configuration Profile that Intune can deploy directly:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadIdentifier</key>
+            <string>com.github.usaran-devk.openfortivpn-gui.config</string>
+            <key>PayloadType</key>
+            <string>com.apple.ManagedClient.preferences</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadUUID</key>
+            <string>12345678-1234-1234-1234-123456789012</string>
+            <key>Forced</key>
+            <array>
+                <dict>
+                    <key>mcx_preference_settings</key>
+                    <dict>
+                        <key>vpnSettings</key>
+                        <string>{"vpnHost":"your.vpn.host.com","samlPort":8020,"setDNS":false,"peerDNS":true}</string>
+                    </dict>
+                </dict>
+            </array>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>OpenFortiVPN Configuration</string>
+    <key>PayloadDisplayName</key>
+    <string>OpenFortiVPN Settings</string>
+    <key>PayloadIdentifier</key>
+    <string>com.github.usaran-devk.openfortivpn-gui.profile</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+    <key>PayloadUUID</key>
+    <string>87654321-4321-4321-4321-210987654321</string>
+</dict>
+</plist>
+```
+
+Upload this profile to Intune as a macOS Configuration Profile and deploy to
+your user groups.
+
+### Option 3: Managed Preferences (System-wide)
+
+For system-wide configuration that applies to all users:
+
+```bash
+#!/bin/bash
+# Create managed preferences directory (requires admin)
+sudo mkdir -p /Library/Managed\ Preferences
+
+# Write the configuration
+sudo defaults write /Library/Managed\ Preferences/com.github.usaran-devk.openfortivpn-gui vpnSettings \
+  '{"vpnHost":"your.vpn.host.com","samlPort":8020,"setDNS":false,"peerDNS":true}'
+
+# Set appropriate permissions
+sudo chown root /Library/Managed\ Preferences/com.github.usaran-devk.openfortivpn-gui.plist
+sudo chmod 644 /Library/Managed\ Preferences/com.github.usaran-devk.openfortivpn-gui.plist
+```
+
+### Configuration Fields
+
+When pre-configuring, set these fields in the JSON settings:
+
+| Field        | Type    | Default | Description                    |
+|--------------|---------|---------|--------------------------------|
+| `vpnHost`    | string  | `""`    | FortiGate VPN gateway hostname |
+| `samlPort`   | integer | `8020`  | Local SAML proxy port (1–65535) |
+| `setDNS`     | boolean | `false` | Enable `--set-dns` flag         |
+| `peerDNS`    | boolean | `true`  | Enable `--pppd-use-peerdns` flag |
+
+### Recommended Approach
+
+For Intune deployment:
+- **Best:** Use **Option 1** (post-install script) — simplest to deploy via
+  Intune's custom script feature
+- **Enterprise:** Use **Option 2** (mobileconfig) — more professional, integrates
+  with MDM frameworks, easier to manage at scale
+
+Both approaches will configure the app on first launch without manual user
+interaction.
+
 ## Run
 
 ```bash
