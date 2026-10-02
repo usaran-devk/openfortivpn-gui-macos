@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-/// A single log entry with a stable, monotonically increasing ID for SwiftUI list identity.
+/// A single log entry with a stable, monotonically increasing ID for list identity.
 struct LogEntry: Identifiable {
     let id: Int
     let text: String
@@ -21,7 +21,7 @@ final class VPNManager: ObservableObject {
     /// The UI observes this to present the install-sudoers alert.
     @Published var showSudoersAlert = false
 
-    /// Monotonically increasing log line ID for stable SwiftUI list identity.
+    /// Monotonically increasing log line ID for stable list identity.
     private(set) var logNextID: Int = 0
 
     /// The `sudo openfortivpn` process we hold directly.

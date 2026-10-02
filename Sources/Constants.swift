@@ -115,6 +115,5 @@ enum Constants {
         static let shieldError = "exclamationmark.shield"
         static let appIcon = "shield.checkered"
         static let trash = "trash"
-        static let settings = "gearshape"
     }
 }

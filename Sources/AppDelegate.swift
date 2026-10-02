@@ -1,11 +1,11 @@
 import AppKit
-import SwiftUI
 
 /// Application delegate that sets up the menu bar icon and popover.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private var settingsWindowController: SettingsWindowController!
     let vpnManager = VPNManager()
 
     // Menu bar SF Symbols are sized via symbol configuration, not image.size.
@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Menu bar only – hide from Dock
         NSApp.setActivationPolicy(.accessory)
+        settingsWindowController = SettingsWindowController(vpnManager: vpnManager)
         setupMenuBar()
     }
 
@@ -41,9 +42,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover = NSPopover()
         popover.contentSize = NSSize(width: Constants.UI.popoverWidth, height: Constants.UI.popoverHeight)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(
-            rootView: MenuBarView().environmentObject(vpnManager)
-        )
+        let menuBarViewController = MenuBarViewController(vpnManager: vpnManager)
+        menuBarViewController.onOpenSettings = { [weak self] in
+            self?.openSettings()
+        }
+        popover.contentViewController = menuBarViewController
 
         // Update icon based on VPN state
         Task {
@@ -80,6 +83,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Closes the popover so the Settings window can appear unobstructed.
     func closePopover() {
         popover.performClose(nil)
+    }
+
+    /// Closes the popover and shows the Settings window.
+    private func openSettings() {
+        closePopover()
+        settingsWindowController.show()
     }
 
     @objc private func togglePopover() {

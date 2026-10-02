@@ -10,8 +10,30 @@ connect/disconnect controls, a live log view, and configurable settings.
 ## Prerequisites
 
 - macOS 14 (Sonoma) or later
-- Swift 6+ toolchain (Xcode Command Line Tools or Xcode)
+- Swift 6+ toolchain (Xcode Command Line Tools — no Xcode installation needed)
 - `openfortivpn` installed (e.g. `brew install openfortivpn`)
+
+No Xcode installation is required, not even on disk. The project builds
+entirely via `swiftc`/`make` from the command line, and the UI is built with
+AppKit rather than SwiftUI specifically to avoid a SwiftUI compiler-plugin
+dependency that only ships inside full `Xcode.app` (see Project Structure
+below for details).
+
+### Recommended editor setup
+
+This repo includes a `.vscode/` configuration for
+[VS Code](https://code.visualstudio.com/) with build, run, and test tasks,
+plus an `lldb` debug configuration. Install the recommended extensions
+(prompted automatically on open, or via `.vscode/extensions.json`):
+
+- [Swift](https://marketplace.visualstudio.com/items?itemName=swiftlang.swift-vscode)
+  (SourceKit-LSP: completion, diagnostics, formatting)
+- [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+  (debugging)
+
+Use `Cmd+Shift+B` to build, the Run and Debug panel to launch or debug, and
+the Test Explorer or `Terminal > Run Task > Test` to run the test suite.
+Any editor with `sourcekit-lsp` support (Neovim, Zed, etc.) works as well.
 
 ## Build
 
@@ -224,21 +246,32 @@ Click the gear icon in the popover footer to open the settings window:
 
 ```
 Sources/
-  OpenFortiVPNApp.swift      # @main entry point
-  AppDelegate.swift          # Menu bar setup, icon state management
-  Constants.swift            # Centralized constants (paths, patterns, defaults)
-  MenuBarView.swift          # SwiftUI popover (status, log, controls)
-  SettingsView.swift         # SwiftUI settings window
-  VPNManager.swift           # VPN process lifecycle & state machine
-  VPNSettings.swift          # Persisted settings model
-  VPNState.swift             # VPN state enum
-  PrivilegedExecution.swift  # sudoers-based privilege escalation & process mgmt
-  Localization.swift         # i18n strings (English + German)
+  main.swift                   # Plain AppKit entry point (NSApplication bootstrap)
+  AppDelegate.swift             # Menu bar setup, icon state management
+  Constants.swift               # Centralized constants (paths, patterns, defaults)
+  MenuBarViewController.swift   # AppKit popover (status, log, controls)
+  SettingsViewController.swift  # AppKit settings window
+  StatusIndicatorView.swift     # Status dot/pulse indicator view
+  VPNManager.swift              # VPN process lifecycle & state machine
+  VPNSettings.swift             # Persisted settings model
+  VPNState.swift                # VPN state enum
+  PrivilegedExecution.swift     # sudoers-based privilege escalation & process mgmt
+  Localization.swift            # i18n strings (English + German)
 Tests/
   Tests.swift                # Unit tests (137 tests)
 Makefile                     # Build, install, test, sudoers management
 Info.plist                   # App bundle metadata
 ```
+
+The UI is built with **AppKit only** (no SwiftUI). This is a deliberate
+choice: SwiftUI's property-wrapper macros (`@State`, `@Binding`,
+`@EnvironmentObject`, etc.) are expanded by a compiler plugin
+(`libSwiftUIMacros.dylib`) that Apple ships only inside the full `Xcode.app`
+bundle, not in the standalone Command Line Tools. Building this project with
+`swiftc`/`make` alone — without any Xcode installation — would fail with a
+"plugin for module 'SwiftUIMacros' not found" error if SwiftUI were used.
+Sticking to AppKit keeps the project fully buildable with just the Swift
+toolchain from the Command Line Tools.
 
 ## Localization
 

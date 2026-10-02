@@ -45,6 +45,12 @@ enum L10n {
         static var quit: String {
             locale == "de" ? "Beenden" : "Quit"
         }
+        static var settings: String {
+            locale == "de" ? "Einstellungen" : "Settings"
+        }
+        static var close: String {
+            locale == "de" ? "Schließen" : "Close"
+        }
     }
 
     // MARK: - Menu Bar

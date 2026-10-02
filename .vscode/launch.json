@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug OpenFortiVPN (lldb)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/.build/OpenFortiVPN.app/Contents/MacOS/OpenFortiVPN",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build"
+        },
+        {
+            "name": "Debug Tests (lldb)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/.build/tests",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Test"
+        }
+    ]
+}

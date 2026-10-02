@@ -881,7 +881,6 @@ func testConstants() {
                 Constants.Symbols.shieldError,
                 Constants.Symbols.appIcon,
                 Constants.Symbols.trash,
-                Constants.Symbols.settings,
             ]
             for symbol in symbols {
                 try expectFalse(symbol.isEmpty, "Symbol name should not be empty")

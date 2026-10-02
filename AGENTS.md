@@ -55,8 +55,13 @@ make uninstall
 ## Code Style Guidelines
 
 ### Imports
-- Use alphabetical order within categories (Foundation first, then AppKit/SwiftUI)
+- Use alphabetical order within categories (Foundation first, then AppKit/Combine)
 - Group related imports: standard library, then framework/library imports
+- **No SwiftUI:** the UI is built with AppKit only. SwiftUI's property-wrapper
+  macros (`@State`, `@Binding`, etc.) require a compiler plugin
+  (`libSwiftUIMacros.dylib`) that Apple ships only inside full `Xcode.app`,
+  not in the Command Line Tools. Introducing SwiftUI would break `swiftc`
+  builds on machines without Xcode installed.
 
 ### Naming Conventions
 - **Types (classes, structs, enums):** PascalCase (e.g., `VPNManager`, `VPNState`)
@@ -94,7 +99,7 @@ make uninstall
 - **Error types:** Define custom `Error` enums for specific error cases; log all errors before throwing
 
 ### Concurrency & Thread Safety
-- **MainActor:** Mark SwiftUI views and view models with `@MainActor` for UI thread safety
+- **MainActor:** Mark view controllers and view models with `@MainActor` for UI thread safety
 - **Sendable:** Apply `Sendable` to types passed between threads (e.g., error states, process output)
 - **Avoid data races:** Use `nonisolated(unsafe)` only for test globals; document the reason
 
@@ -106,7 +111,7 @@ make uninstall
 ### Testing
 - **Use custom test framework:** `Tests/Tests.swift` provides `describe()`, `it()`, `mainActorIt()`, and expectations
 - **Testable sources:** Listed in Makefile `TESTABLE_SOURCES` (currently: Constants, Localization, VPNState, VPNSettings, PrivilegedExecution, VPNManager)
-- **Exclude from tests:** UI files (MenuBarView, SettingsView, AppDelegate) and `@main` entry point
+- **Exclude from tests:** UI files (MenuBarViewController, SettingsViewController, AppDelegate, StatusIndicatorView) and `main.swift` entry point
 - **Expectations:** Use `expect()`, `expectTrue()`, `expectFalse()`, `expectNil()`, `expectNotNil()`, etc.
 - **No interactive tests:** Avoid password prompts; mock/inject dependencies instead
 - **Test isolation:** Each test should be independent; clean up shared state (e.g., UserDefaults) manually after each test

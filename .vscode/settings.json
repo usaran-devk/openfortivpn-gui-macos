@@ -1,0 +1,16 @@
+{
+    "files.exclude": {
+        ".build": false
+    },
+    "search.exclude": {
+        ".build": true
+    },
+    "sourcekit-lsp.serverArguments": [],
+    "swift.path": "/Library/Developer/CommandLineTools/usr/bin",
+    "swift.buildArguments": [],
+    "[swift]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.formatOnSave": false
+    }
+}
